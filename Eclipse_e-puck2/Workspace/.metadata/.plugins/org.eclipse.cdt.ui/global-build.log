@@ -1,16 +1,11 @@
-13:55:07 **** Incremental Build of configuration Default for project My_project ****
+10:54:54 **** Incremental Build of configuration Default for project My_project ****
 make all 
 [1;34mCompiling main.c[0m
-[1;34mLinking build/Project_template.elf[0m
-[1;34mCreating build/Project_template.hex[0m
-[1;34mCreating build/Project_template.bin[0m
-[1;34mCreating build/Project_template.dmp[0m
-
-   text	   data	    bss	    dec	    hex	filename
-  61252	   3028	  17444	  81724	  13f3c	build/Project_template.elf
-[1;34mCreating build/Project_template.list[0m
-
-[1;34mDone[0m
-13:55:12 **** Incremental Build of configuration Default for project My_project ****
-make all 
-make: Nothing to be done for 'all'.
+main.c: In function 'readBB':
+main.c:29:3: error: 'p' undeclared (first use in this function)
+   p = dirArr[0];
+   ^
+main.c:29:3: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [build/obj/main.o] Error 1
+../e-puck2_main-processor/ChibiOS//os/common/ports/ARMCMx/compilers/GCC/rules.mk:216: recipe for target 'build/obj/main.o' failed
+"make all" terminated with exit code 2. Build might be incomplete.

@@ -13,7 +13,23 @@
 #include "epuck1x/uart/e_uart_char.h"
 #include "stdio.h"
 #include "serial_comm.h"
+#include "motors.h"
 
+//int dirArr[8];
+
+int *readBB(int prox[8]){
+	// color the LEDs red
+	int *r;
+	static int dirArr[8];
+	for(int j = 0; j < 8 ; j++){
+		if (prox[j] > 500)
+			dirArr[j] = 1;
+		else
+			dirArr[j] = 0;
+		p = dirArr[0];
+	}
+	return r;
+}
 
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
@@ -29,33 +45,50 @@ int main(void)
 
     clear_leds();
     spi_comm_start();
+    motors_init();
 
     proximity_start();
     calibrate_ir();
     serial_start();
-    int x=0;
+    //int x=0;
+    int prox[8];
+    int *dir;
 
-    char str[100];
+    //char str[100];
 
     /* Infinite loop. */
     while (1) {
     	//waits 1 second
+    	for (int i = 0; i < 8; i++){
+    		prox[i] = get_prox(i);
+    	}
 
-    	x =  get_prox(2);
-    	int str_length = sprintf(str, "Proximity sensor value %d!\n",x);
-    	e_send_uart1_char(str, str_length);
-    	if (x>1000)
+    	//int str_length = sprintf(str, "Proximity sensor value %d!\n",prox);
+    	//e_send_uart1_char(str, str_length);
+    	dir = readBB(prox);
+
+    	/*if (x>500)
 		{
+
     		set_front_led(1);
+    		left_motor_set_speed(10);
+    		right_motor_set_speed(-10);
+
 		}
     	else
     	{
     		set_front_led(0);
+    		left_motor_set_speed(0);
+    		right_motor_set_speed(0);
     	}
     	//set_front_led(1);
         //chThdSleepMilliseconds(5000);
         //set_front_led(0);
-        //chThdSleepMilliseconds(5000);
+        //chThdSleepMilliseconds(5000);*/
+    	for(int k=0;k<8;k++)
+    	{
+    		set_led( k , *(dir+k));
+    	}
 
     }
 }
