@@ -1,0 +1,170 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include "ch.h"
+#include "hal.h"
+#include "selector.h"
+#include "memory_protection.h"
+#include <main.h>
+#include <stdbool.h>
+#include "leds.h"
+#include "spi_comm.h"
+#include "sensors/proximity.h"
+#include "epuck1x/uart/e_uart_char.h"
+#include "stdio.h"
+#include "serial_comm.h"
+#include "motors.h"
+#include "sensors/VL53L0X/VL53L0X.h"
+
+int motor_speed = 500;
+int motor_speed_r = -500;
+int dirArr[8];
+_Bool BB_flag;
+_Bool OR_flag;
+
+int F_flag = 0;
+int R_flag = 0;
+int L_flag = 0;
+
+void move_forward(void){
+	left_motor_set_speed(motor_speed);
+	right_motor_set_speed(motor_speed);
+}
+
+void move_back(void){
+	left_motor_set_speed(motor_speed_r);
+	right_motor_set_speed(motor_speed_r);
+}
+
+void turn_right(void){
+	left_motor_set_speed(motor_speed_r);
+	right_motor_set_speed(motor_speed);
+}
+
+void turn_left(void){
+	left_motor_set_speed(motor_speed);
+	right_motor_set_speed(motor_speed_r);
+}
+
+void BB_contains(void){
+    for (int i = 0; i < 8; i++) {
+        if (dirArr[i] == 1) {
+        	BB_flag = true;
+            break;
+        }
+        else{
+        	BB_flag = false;
+        	break;
+        }
+    }
+}
+
+int *readBB(int prox[8]){
+	for(int j = 0; j < 8 ; j++){
+		if (prox[j] > 400){
+			dirArr[j] = 1;
+		    set_rgb_led( j+1, 10, 0, 0);
+		}
+		else{
+			dirArr[j] = 0;
+		    set_rgb_led( j+1, 0, 10, 0);
+		}
+		F_flag = dirArr[0] + dirArr[7];
+		R_flag = dirArr[0] + dirArr[1] + dirArr[2];
+		L_flag = dirArr[7] + dirArr[6] + dirArr[5];
+	}
+	return dirArr;
+}
+
+void set_fire(void){
+	set_led(2, 1);
+	set_led(3, 1);
+	set_led(4, 1);
+	set_led(6, 1);
+	set_led(7, 1);
+	set_led(8, 1);
+}
+
+messagebus_t bus;
+MUTEX_DECL(bus_lock);
+CONDVAR_DECL(bus_condvar);
+
+
+int main(void)
+{
+	messagebus_init(&bus, &bus_lock, &bus_condvar);
+    halInit();
+    chSysInit();
+    mpu_init();
+    VL53L0X_start();
+    clear_leds();
+    spi_comm_start();
+    motors_init();
+    proximity_start();
+    calibrate_ir();
+    serial_start();
+
+    int prox[8];
+    int *dir;
+    int dist = 0;
+
+    /* Infinite loop. */
+    while (1) {
+    	for (int i = 0; i < 8; i++){prox[i] = get_prox(i);} // Read proximity sensor values
+    	dir = readBB(prox);
+    	for(int k=0;k<8;k++){set_led( k+1 , *(dir+k));}  // Set LED values
+    	dist = VL53L0X_get_dist_mm();
+    	set_fire();
+        int sw_val = get_selector();
+    	switch(sw_val) {
+    	    case 0 : // Avoider
+        	    set_body_led(1);
+    	    	if (dist > 30)
+    	    	{
+    	    		BB_contains();
+    	    		if(!BB_flag){
+    	    			move_forward();//Move forward
+    	    		}
+    	    		else{
+    	    			if(R_flag>0 && L_flag==0){ // if obstacle on right
+    	    				turn_left();
+    	    			}
+    	    			else if(L_flag>0 && R_flag==0){turn_right();}// if obstacle on left
+    	    			else if(L_flag>0 && R_flag>0)
+    	    				move_back();
+    	    				//wait for a full turn
+    	    			else{
+    	    				turn_left();
+    	    				chThdSleepMilliseconds(100);
+
+    	    			}
+    	    			}
+    	    		}
+    	    	break;
+    	    case 1 : // pursuer
+    	    	set_body_led(2);
+    	    	BB_contains();
+    	    	if((F_flag==1) && (!BB_flag)){move_forward();}//Move forward
+    	    	else{
+    	    	    if(R_flag>0 && L_flag==0){turn_right();} // if obstacle on right
+    	    	    else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
+    	   			else{
+    	   				turn_right();
+    	   				chThdSleepMilliseconds(100);
+    	   			}//wait for a full turn
+    	    	    }
+    	    default :
+    	    	break;
+    	}
+    	chThdSleepMilliseconds(100);
+    }
+}
+
+#define STACK_CHK_GUARD 0xe2dee396
+uintptr_t __stack_chk_guard = STACK_CHK_GUARD;
+
+void __stack_chk_fail(void)
+{
+    chSysHalt("Stack smashing detected");
+}
