@@ -137,9 +137,9 @@ int main(void)
     	    		}
     	    		else{
     	    			if(R_flag>0 && L_flag==0){ // if obstacle on right
-    	    				turn_right();
+    	    				turn_left();
     	    			}
-    	    			else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
+    	    			else if(L_flag>0 && R_flag==0){turn_right();}// if obstacle on left
     	    			else if(L_flag>0 && R_flag>0 && F_flag > 0){
     	    				move_back();
     	    				turn_right();
@@ -152,7 +152,7 @@ int main(void)
     	    		}
     	    	else{
 	    			if(R_flag>0 && L_flag==0){ // if obstacle on right
-	    				turn_right();
+	    				turn_left();
 	    			}
 	    			else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
 	    			else if(L_flag>0 && R_flag>0 && F_flag > 0){
