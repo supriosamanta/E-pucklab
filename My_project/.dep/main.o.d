@@ -132,6 +132,7 @@ build/obj/main.o: main.c \
  ../e-puck2_main-processor/ChibiOS_ext/os/hal/ports/STM32/STM32F4xx/stm32_registry.h \
  ../e-puck2_main-processor/ChibiOS//os/hal/include/mmc_spi.h \
  ../e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h \
+ ../e-puck2_main-processor/src/selector.h \
  ../e-puck2_main-processor/src/memory_protection.h main.h \
  ../e-puck2_main-processor/src/msgbus/messagebus.h \
  /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/unistd.h \
@@ -142,7 +143,17 @@ build/obj/main.o: main.c \
  ../e-puck2_main-processor/src/sensors/proximity.h \
  ../e-puck2_main-processor/src/epuck1x/uart/e_uart_char.h \
  ../e-puck2_main-processor/src/serial_comm.h \
- ../e-puck2_main-processor/src/motors.h
+ ../e-puck2_main-processor/src/motors.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h \
+ ../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h
 
 /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/stdio.h:
 
@@ -410,6 +421,8 @@ build/obj/main.o: main.c \
 
 ../e-puck2_main-processor/ChibiOS//os/hal/include/serial_usb.h:
 
+../e-puck2_main-processor/src/selector.h:
+
 ../e-puck2_main-processor/src/memory_protection.h:
 
 main.h:
@@ -433,3 +446,23 @@ main.h:
 ../e-puck2_main-processor/src/serial_comm.h:
 
 ../e-puck2_main-processor/src/motors.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/VL53L0X.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_api_strings.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_def.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_device.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/vl53l0x_types.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/../../core/inc/vl53l0x_def.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_platform_log.h:
+
+../e-puck2_main-processor/src/sensors/VL53L0X/Api/core/inc/../../platform/inc/vl53l0x_i2c_platform.h:

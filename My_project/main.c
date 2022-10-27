@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
 #include "ch.h"
 #include "hal.h"
+#include "selector.h"
 #include "memory_protection.h"
 #include <main.h>
+#include <stdbool.h>
 #include "leds.h"
 #include "spi_comm.h"
 #include "sensors/proximity.h"
@@ -14,21 +15,84 @@
 #include "stdio.h"
 #include "serial_comm.h"
 #include "motors.h"
+#include "sensors/VL53L0X/VL53L0X.h"
 
-//int dirArr[8];
+int motor_speed = 500;
+int motor_speed_r = -500;
+int dirArr[8];
+_Bool BB_flag;
+_Bool OR_flag;
+
+int F_flag = 0;
+int R_flag = 0;
+int L_flag = 0;
+
+void move_forward(void){
+	left_motor_set_speed(motor_speed);
+	right_motor_set_speed(motor_speed);
+	//chThdSleepMilliseconds(100);
+}
+
+void move_back(void){
+	left_motor_set_speed(motor_speed_r);
+	right_motor_set_speed(motor_speed_r);
+	//chThdSleepMilliseconds(100);
+}
+
+void stop(void){
+	left_motor_set_speed(0);
+	right_motor_set_speed(0);
+}
+
+void turn_left(void){
+	left_motor_set_speed(motor_speed_r);
+	right_motor_set_speed(motor_speed);
+	//chThdSleepMilliseconds(100);
+}
+
+void turn_right(void){
+	left_motor_set_speed(motor_speed);
+	right_motor_set_speed(motor_speed_r);
+	//chThdSleepMilliseconds(100);
+}
+
+void BB_contains(void){
+    for (int i = 0; i < 8; i++) {
+        if (dirArr[i] == 1) {
+        	BB_flag = true;
+            break;
+        }
+        else{
+        	BB_flag = false;
+        	break;
+        }
+    }
+}
 
 int *readBB(int prox[8]){
-	// color the LEDs red
-	int *r;
-	static int dirArr[8];
 	for(int j = 0; j < 8 ; j++){
-		if (prox[j] > 500)
+		if (prox[j] > 400){
 			dirArr[j] = 1;
-		else
+		    set_rgb_led( j+1, 10, 0, 0);
+		}
+		else{
 			dirArr[j] = 0;
-		p = dirArr[0];
+		    set_rgb_led( j+1, 0, 10, 0);
+		}
+		F_flag = dirArr[0] + dirArr[7];
+		R_flag = dirArr[1] + dirArr[2];
+		L_flag = dirArr[6] + dirArr[5];
 	}
-	return r;
+	return dirArr;
+}
+
+void set_fire(void){
+	set_led(2, 1);
+	set_led(3, 1);
+	set_led(4, 1);
+	set_led(6, 1);
+	set_led(7, 1);
+	set_led(8, 1);
 }
 
 messagebus_t bus;
@@ -42,54 +106,79 @@ int main(void)
     halInit();
     chSysInit();
     mpu_init();
-
+    VL53L0X_start();
     clear_leds();
     spi_comm_start();
     motors_init();
-
     proximity_start();
     calibrate_ir();
     serial_start();
-    //int x=0;
+
     int prox[8];
     int *dir;
-
-    //char str[100];
+    int dist = 0;
 
     /* Infinite loop. */
     while (1) {
-    	//waits 1 second
-    	for (int i = 0; i < 8; i++){
-    		prox[i] = get_prox(i);
-    	}
-
-    	//int str_length = sprintf(str, "Proximity sensor value %d!\n",prox);
-    	//e_send_uart1_char(str, str_length);
+    	for (int i = 0; i < 8; i++){prox[i] = get_prox(i);} // Read proximity sensor values
     	dir = readBB(prox);
-
-    	/*if (x>500)
-		{
-
-    		set_front_led(1);
-    		left_motor_set_speed(10);
-    		right_motor_set_speed(-10);
-
-		}
-    	else
-    	{
-    		set_front_led(0);
-    		left_motor_set_speed(0);
-    		right_motor_set_speed(0);
+    	for(int k=0;k<8;k++){set_led( k+1 , *(dir+k));}  // Set LED values
+    	dist = VL53L0X_get_dist_mm();
+    	set_fire();
+        int sw_val = get_selector();
+    	switch(sw_val) {
+    	    case 0 : // Avoider
+        	    set_body_led(1);
+    	    	if (dist > 30)
+    	    	{
+    	    		BB_contains();
+    	    		if(!BB_flag){
+    	    			move_forward();//Move forward
+    	    		}
+    	    		else{
+    	    			if(R_flag>0 && L_flag==0){ // if obstacle on right
+    	    				turn_right();
+    	    			}
+    	    			else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
+    	    			else if(L_flag>0 && R_flag>0 && F_flag > 0){
+    	    				move_back();
+    	    				turn_right();
+    	    			}
+    	    				//wait for a full turn
+    	    			else{
+    	    				stop();
+    	    			}
+    	    			}
+    	    		}
+    	    	else{
+	    			if(R_flag>0 && L_flag==0){ // if obstacle on right
+	    				turn_right();
+	    			}
+	    			else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
+	    			else if(L_flag>0 && R_flag>0 && F_flag > 0){
+	    				move_back();
+	    				turn_right();
+	    			}
+	    				//wait for a full turn
+	    			else{
+	    				stop();
+	    			}
+    	    		break;
+    	    	}
+    	    case 1 : // pursuer
+    	    	set_body_led(2);
+    	    	BB_contains();
+    	    	if((F_flag==1) && (!BB_flag)){move_forward();}//Move forward
+    	    	else{
+    	    	    if(R_flag>0 && L_flag==0){turn_right();} // if obstacle on right
+    	    	    else if(L_flag>0 && R_flag==0){turn_left();}// if obstacle on left
+    	   			else{
+    	   				stop();
+    	   			}//wait for a full turn
+    	    	    }
+    	    default :
+    	    	break;
     	}
-    	//set_front_led(1);
-        //chThdSleepMilliseconds(5000);
-        //set_front_led(0);
-        //chThdSleepMilliseconds(5000);*/
-    	for(int k=0;k<8;k++)
-    	{
-    		set_led( k , *(dir+k));
-    	}
-
     }
 }
 
