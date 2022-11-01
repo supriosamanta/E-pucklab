@@ -35,6 +35,8 @@ build/obj/main.o: main.c \
  /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/xlocale.h \
  /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/strings.h \
  /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h \
+ /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/time.h \
+ /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/machine/time.h \
  /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h \
  ../e-puck2_main-processor/ChibiOS//os/rt/include/ch.h \
  ../e-puck2_main-processor/ChibiOS//os/rt/ports/ARMCMx/compilers/GCC/chtypes.h \
@@ -226,6 +228,10 @@ build/obj/main.o: main.c \
 /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/strings.h:
 
 /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/sys/string.h:
+
+/home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/time.h:
+
+/home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/machine/time.h:
 
 /home/uos/Documents/E-pucklab/Eclipse_e-puck2/Tools/gcc-arm-none-eabi-7-2017-q4-major/arm-none-eabi/include/math.h:
 
